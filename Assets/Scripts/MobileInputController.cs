@@ -1,42 +1,69 @@
-
 using UnityEngine;
 
 public class MobileInputController : MonoBehaviour
 {
     public PlayerCarController carController;
 
+    private bool IsReady()
+    {
+        if (carController != null)
+            return true;
+
+        Debug.LogWarning("PlayerCarController is not assigned.");
+        return false;
+    }
+
     public void LeftButtonDown()
     {
-        carController.SetSteering(-1f);
+        if (IsReady())
+            carController.SetSteering(-1f);
     }
 
     public void RightButtonDown()
     {
-        carController.SetSteering(1f);
+        if (IsReady())
+            carController.SetSteering(1f);
     }
 
     public void SteeringRelease()
     {
-        carController.SetSteering(0f);
+        if (IsReady())
+            carController.SetSteering(0f);
     }
 
     public void AccelerationDown()
     {
-        carController.SetAcceleration(true);
+        if (IsReady())
+            carController.SetAcceleration(true);
     }
 
     public void AccelerationUp()
     {
-        carController.SetAcceleration(false);
+        if (IsReady())
+            carController.SetAcceleration(false);
     }
 
     public void BrakeDown()
     {
-        carController.SetBraking(true);
+        if (IsReady())
+            carController.SetBraking(true);
     }
 
     public void BrakeUp()
     {
-        carController.SetBraking(false);
+        if (IsReady())
+            carController.SetBraking(false);
+    }
+
+    public void ReverseDown()
+    {
+        if (IsReady())
+            carController.SetReversing(true);
+    }
+
+    public void ReverseUp()
+    {
+        if (IsReady())
+            carController.SetReversing(false);
     }
 }
