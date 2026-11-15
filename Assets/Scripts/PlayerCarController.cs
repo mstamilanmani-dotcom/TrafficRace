@@ -1,18 +1,29 @@
-
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerCarController : MonoBehaviour
 {
-    public float acceleration = 8000f;
+    [Header("Engine")]
+    public float acceleration = 12f;
     public float maxSpeed = 45f;
-    public float brakePower = 12000f;
-    public float steeringSpeed = 80f;
+    public float reverseSpeed = 12f;
+
+    [Header("Brakes")]
+    public float brakePower = 25f;
+
+    [Header("Steering")]
+    public float steeringSpeed = 65f;
+    public float steeringSmoothness = 5f;
+
+    [Header("Handling")]
+    public float lateralGrip = 4f;
 
     private Rigidbody rb;
     private float steering;
+    private float currentSteering;
     private bool accelerating;
     private bool braking;
+    private bool reversing;
 
     void Awake()
     {
@@ -22,24 +33,67 @@ public class PlayerCarController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float speed = rb.velocity.magnitude;
+        Vector3 velocity = rb.linearVelocity;
 
-        if (accelerating && speed < maxSpeed)
-            rb.AddForce(transform.forward * acceleration * Time.fixedDeltaTime,
-                ForceMode.Force);
+        float forwardSpeed =
+            Vector3.Dot(velocity, transform.forward);
+
+        if (accelerating && forwardSpeed < maxSpeed)
+        {
+            rb.AddForce(
+                transform.forward * acceleration,
+                ForceMode.Acceleration
+            );
+        }
+
+        if (reversing && forwardSpeed > -reverseSpeed)
+        {
+            rb.AddForce(
+                -transform.forward * acceleration * 0.6f,
+                ForceMode.Acceleration
+            );
+        }
 
         if (braking)
-            rb.AddForce(-transform.forward * brakePower * Time.fixedDeltaTime,
-                ForceMode.Force);
-
-        if (speed > 1f)
         {
-            float turn = steering * steeringSpeed *
-                         Time.fixedDeltaTime;
-
-            rb.MoveRotation(rb.rotation *
-                Quaternion.Euler(0f, turn, 0f));
+            rb.AddForce(
+                -velocity.normalized * brakePower,
+                ForceMode.Acceleration
+            );
         }
+
+        currentSteering = Mathf.Lerp(
+            currentSteering,
+            steering,
+            steeringSmoothness * Time.fixedDeltaTime
+        );
+
+        if (Mathf.Abs(forwardSpeed) > 0.5f)
+        {
+            float direction = forwardSpeed >= 0f ? 1f : -1f;
+
+            float turn = currentSteering *
+                         steeringSpeed *
+                         Time.fixedDeltaTime *
+                         direction;
+
+            rb.MoveRotation(
+                rb.rotation *
+                Quaternion.Euler(0f, turn, 0f)
+            );
+        }
+
+        Vector3 localVelocity =
+            transform.InverseTransformDirection(rb.linearVelocity);
+
+        localVelocity.x = Mathf.Lerp(
+            localVelocity.x,
+            0f,
+            lateralGrip * Time.fixedDeltaTime
+        );
+
+        rb.linearVelocity =
+            transform.TransformDirection(localVelocity);
     }
 
     public void SetSteering(float value)
@@ -55,5 +109,10 @@ public class PlayerCarController : MonoBehaviour
     public void SetBraking(bool value)
     {
         braking = value;
+    }
+
+    public void SetReversing(bool value)
+    {
+        reversing = value;
     }
 }
