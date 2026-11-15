@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SoloTravelManager : MonoBehaviour
 {
@@ -35,7 +36,8 @@ public class SoloTravelManager : MonoBehaviour
     public WeatherType weather = WeatherType.Sunny;
     public TimeOfDay timeOfDay = TimeOfDay.Day;
 
-    public bool raceTimerEnabled = false;
+    [Header("Scene Settings")]
+    public string drivingSceneName = "GameScene";
 
     public void SetTravelType(int value)
     {
@@ -59,5 +61,17 @@ public class SoloTravelManager : MonoBehaviour
     {
         if (System.Enum.IsDefined(typeof(TimeOfDay), value))
             timeOfDay = (TimeOfDay)value;
+    }
+
+    public void StartSoloDrive()
+    {
+        PlayerPrefs.SetInt("TravelType", (int)travelType);
+        PlayerPrefs.SetInt("TrafficLevel", (int)traffic);
+        PlayerPrefs.SetInt("WeatherType", (int)weather);
+        PlayerPrefs.SetInt("TimeOfDay", (int)timeOfDay);
+
+        PlayerPrefs.Save();
+
+        SceneManager.LoadScene(drivingSceneName);
     }
 }
