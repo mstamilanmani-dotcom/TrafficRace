@@ -42,12 +42,15 @@ public class BeachParkingBuilder : MonoBehaviour
 
     void CreateParkingLines()
     {
-        float startZ = parkingZ -
-            ((parkingSlots - 1) * slotSpacing / 2f);
+        int slots = Mathf.Max(1, parkingSlots);
+        float spacing = Mathf.Max(0.1f, slotSpacing);
 
-        for (int i = 0; i <= parkingSlots; i++)
+        // Equal spacing on both sides of the parking centre
+        float startZ = parkingZ - (slots * spacing / 2f);
+
+        for (int i = 0; i <= slots; i++)
         {
-            float z = startZ + i * slotSpacing;
+            float z = startZ + i * spacing;
 
             CreatePart(
                 "Parking_White_Line",
@@ -92,13 +95,23 @@ public class BeachParkingBuilder : MonoBehaviour
             signMaterial
         );
 
-        GameObject textObject = new GameObject("Parking_Sign_Text");
-        textObject.transform.SetParent(board.transform, false);
-        textObject.transform.localPosition = new Vector3(0f, 0f, -0.55f);
+        GameObject textObject =
+            new GameObject("Parking_Sign_Text");
 
-        TextMeshPro text = textObject.AddComponent<TextMeshPro>();
+        textObject.transform.SetParent(board.transform, false);
+
+        // Text faces the front (+Z) side of the board
+        textObject.transform.localPosition =
+            new Vector3(0f, 0f, 0.09f);
+
+        TextMeshPro text =
+            textObject.AddComponent<TextMeshPro>();
+
         text.text = "BEACH PARKING";
-        text.fontSize = 3f;
+        text.fontSize = 2f;
+        text.fontSizeMin = 0.5f;
+        text.fontSizeMax = 2f;
+        text.enableAutoSizing = true;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
 
@@ -112,7 +125,9 @@ public class BeachParkingBuilder : MonoBehaviour
         Vector3 scale,
         Material material)
     {
-        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject obj =
+            GameObject.CreatePrimitive(PrimitiveType.Cube);
+
         obj.name = objectName;
         obj.transform.SetParent(transform, false);
         obj.transform.localPosition = position;
