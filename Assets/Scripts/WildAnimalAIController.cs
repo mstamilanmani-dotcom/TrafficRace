@@ -9,7 +9,31 @@ public enum WildAnimalType
     Horse,
     Monkey,
     Peacock,
-    Dog
+    Dog,
+    Lion,
+    Tiger,
+    Leopard,
+    Cheetah,
+    Wolf,
+    Bear,
+    Fox,
+    Giraffe,
+    Zebra,
+    Rhinoceros,
+    Hippopotamus,
+    Crocodile,
+    Bison,
+    Buffalo,
+    Kangaroo,
+    Camel,
+    Gorilla,
+    Chimpanzee,
+    Squirrel,
+    Rabbit,
+    Eagle,
+    Parrot,
+    Flamingo,
+    Turtle
 }
 
 public class WildAnimalAIController : MonoBehaviour
