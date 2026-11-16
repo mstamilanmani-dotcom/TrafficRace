@@ -25,7 +25,7 @@ public class BeachParkedVehiclesBuilder : MonoBehaviour
         for (int i = 0; i < vehicleCount; i++)
         {
             float z = parkingZ -
-                ((vehicleCount - 1) * slotSpacing / 2f)
+                (vehicleCount * slotSpacing / 2f)
                 + (i * slotSpacing)
                 + (slotSpacing / 2f);
 
