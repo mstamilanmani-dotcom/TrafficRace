@@ -41,6 +41,8 @@ public class BeachParkedVehiclesBuilder : MonoBehaviour
         GameObject car = new GameObject("Parked_Car_" + index);
         car.transform.SetParent(transform, false);
         car.transform.localPosition = new Vector3(parkingX, 0.16f, z);
+        DrivableVehicle carDrive = car.AddComponent<DrivableVehicle>();
+        carDrive.vehicleKind = VehicleKind.Car;
 
         Material bodyMaterial = GetCarMaterial(index);
 
@@ -83,6 +85,9 @@ public class BeachParkedVehiclesBuilder : MonoBehaviour
         GameObject bike = new GameObject("Parked_Bike_" + index);
         bike.transform.SetParent(transform, false);
         bike.transform.localPosition = new Vector3(parkingX, 0.16f, z);
+        DrivableVehicle bikeDrive = bike.AddComponent<DrivableVehicle>();
+        bikeDrive.vehicleKind = VehicleKind.Bike;
+        bike.GetComponent<Rigidbody>().mass = 180f;
 
         CreateWheel(bike.transform, new Vector3(0f, 0.45f, 0.85f));
         CreateWheel(bike.transform, new Vector3(0f, 0.45f, -0.85f));
