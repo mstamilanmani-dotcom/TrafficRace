@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BeachOceanAnimator : MonoBehaviour
 {
@@ -20,10 +21,12 @@ public class BeachOceanAnimator : MonoBehaviour
     [Header("Foam")]
     public Material foamMaterial;
     public Color foamColor = Color.white;
+    [Range(0f, 1f)] public float foamTransparency = 0.75f;
     public float foamWidth = 0.22f;
     [Range(10, 100)] public int pointsPerWave = 50;
 
     private Material oceanMaterial;
+    private Material foamMaterialInstance;
     private LineRenderer[] waveLines;
     private float elapsedTime;
 
@@ -35,19 +38,70 @@ public class BeachOceanAnimator : MonoBehaviour
         if (oceanRenderer != null)
             oceanMaterial = oceanRenderer.material;
 
+        SetupFoamMaterial();
         BuildWaves();
+    }
+
+    void SetupFoamMaterial()
+    {
+        if (foamMaterial == null)
+            return;
+
+        foamMaterialInstance = new Material(foamMaterial);
+
+        Color finalColor = foamColor;
+        finalColor.a = foamTransparency;
+
+        if (foamMaterialInstance.HasProperty("_BaseColor"))
+            foamMaterialInstance.SetColor("_BaseColor", finalColor);
+
+        if (foamMaterialInstance.HasProperty("_Color"))
+            foamMaterialInstance.SetColor("_Color", finalColor);
+
+        // Standard shader transparency
+        if (foamMaterialInstance.HasProperty("_Mode"))
+        {
+            foamMaterialInstance.SetFloat("_Mode", 3f);
+            foamMaterialInstance.SetInt(
+                "_SrcBlend", (int)BlendMode.SrcAlpha);
+            foamMaterialInstance.SetInt(
+                "_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            foamMaterialInstance.SetInt("_ZWrite", 0);
+
+            foamMaterialInstance.DisableKeyword("_ALPHATEST_ON");
+            foamMaterialInstance.EnableKeyword("_ALPHABLEND_ON");
+            foamMaterialInstance.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        }
+
+        // URP shader transparency
+        if (foamMaterialInstance.HasProperty("_Surface"))
+        {
+            foamMaterialInstance.SetFloat("_Surface", 1f);
+            foamMaterialInstance.SetFloat("_ZWrite", 0f);
+            foamMaterialInstance.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        }
+
+        foamMaterialInstance.renderQueue =
+            (int)RenderQueue.Transparent;
     }
 
     void BuildWaves()
     {
+        waveCount = Mathf.Max(0, waveCount);
+        pointsPerWave = Mathf.Max(2, pointsPerWave);
+
         waveLines = new LineRenderer[waveCount];
 
         for (int i = 0; i < waveCount; i++)
         {
-            GameObject waveObject = new GameObject("Ocean_Foam_Wave_" + i);
+            GameObject waveObject =
+                new GameObject("Ocean_Foam_Wave_" + i);
+
             waveObject.transform.SetParent(transform, false);
 
-            LineRenderer line = waveObject.AddComponent<LineRenderer>();
+            LineRenderer line =
+                waveObject.AddComponent<LineRenderer>();
+
             line.useWorldSpace = false;
             line.positionCount = pointsPerWave;
             line.startWidth = foamWidth;
@@ -60,8 +114,8 @@ public class BeachOceanAnimator : MonoBehaviour
             line.numCornerVertices = 4;
             line.receiveShadows = false;
 
-            if (foamMaterial != null)
-                line.sharedMaterial = foamMaterial;
+            if (foamMaterialInstance != null)
+                line.sharedMaterial = foamMaterialInstance;
 
             waveLines[i] = line;
         }
@@ -70,7 +124,6 @@ public class BeachOceanAnimator : MonoBehaviour
     void Update()
     {
         elapsedTime += Time.deltaTime;
-
         AnimateWaterTexture();
         AnimateWaves();
     }
@@ -106,13 +159,15 @@ public class BeachOceanAnimator : MonoBehaviour
             for (int p = 0; p < pointsPerWave; p++)
             {
                 float t = (float)p / (pointsPerWave - 1);
-                float z = Mathf.Lerp(-waveLength / 2f, waveLength / 2f, t);
+                float z = Mathf.Lerp(
+                    -waveLength / 2f, waveLength / 2f, t);
 
                 float curve = Mathf.Sin(
                     z * 0.08f + elapsedTime * speed + i * 1.7f
                 ) * amplitude;
 
                 float x = baseX + travel + curve;
+
                 float y = foamHeight + Mathf.Sin(
                     z * 0.12f + elapsedTime * speed
                 ) * 0.025f;
@@ -126,5 +181,8 @@ public class BeachOceanAnimator : MonoBehaviour
     {
         if (oceanMaterial != null)
             Destroy(oceanMaterial);
+
+        if (foamMaterialInstance != null)
+            Destroy(foamMaterialInstance);
     }
 }
