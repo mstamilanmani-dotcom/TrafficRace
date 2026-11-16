@@ -8,7 +8,8 @@ public class VehiclePrefabManager : MonoBehaviour
         Car,
         Bike,
         Bus,
-        Truck        SUV,
+        Truck,
+        SUV,
         ElectricCar,
         Ather,
         OlaElectric
@@ -57,7 +58,5 @@ public class VehiclePrefabManager : MonoBehaviour
 
         return false;
     }
-
-}
 }
 
