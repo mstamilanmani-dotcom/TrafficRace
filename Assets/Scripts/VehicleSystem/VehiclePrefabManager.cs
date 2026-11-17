@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+// VehicleType enum is shared by the whole vehicle system.
+// Prefabs now live in VehiclePrefabFactory; the list below is legacy.
 public class VehiclePrefabManager : MonoBehaviour
 {
     public enum VehicleType
@@ -22,9 +24,10 @@ public class VehiclePrefabManager : MonoBehaviour
         public GameObject prefab;
     }
 
-    [Header("Vehicle Prefabs")]
+    [Header("Legacy (use VehiclePrefabFactory)")]
     public List<VehicleData> vehicles = new List<VehicleData>();
 
+    [System.Obsolete("Use VehicleSpawnManager.", false)]
     public GameObject SpawnVehicle(
         VehicleType type,
         Vector3 position,
@@ -59,4 +62,3 @@ public class VehiclePrefabManager : MonoBehaviour
         return false;
     }
 }
-

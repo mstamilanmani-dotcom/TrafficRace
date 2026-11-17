@@ -14,11 +14,18 @@ public class VehicleResetManager : MonoBehaviour
         }
 
         Rigidbody rb = vehicle.GetComponent<Rigidbody>();
+        bool wasKinematic = false;
 
         if (rb != null)
         {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            wasKinematic = rb.isKinematic;
+
+            if (!wasKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
             rb.isKinematic = true;
         }
 
@@ -29,10 +36,9 @@ public class VehicleResetManager : MonoBehaviour
 
         if (rb != null)
         {
-            rb.isKinematic = false;
+            rb.isKinematic = wasKinematic;
         }
 
         Debug.Log("Vehicle reset completed!");
     }
 }
-

@@ -4,28 +4,18 @@ using System.Collections.Generic;
 public class VehicleDataManager : MonoBehaviour
 {
     [Header("Vehicle Database")]
-    public VehiclePrefabManager prefabManager;
+    public VehiclePrefabFactory prefabFactory;
 
     public GameObject GetVehiclePrefab(
         VehiclePrefabManager.VehicleType type)
     {
-        if (prefabManager == null)
+        if (prefabFactory == null)
         {
-            Debug.LogError("Vehicle Prefab Manager missing!");
+            Debug.LogError("Vehicle Prefab Factory missing!");
             return null;
         }
 
-        foreach (VehiclePrefabManager.VehicleData vehicle
-                 in prefabManager.vehicles)
-        {
-            if (vehicle.type == type)
-            {
-                return vehicle.prefab;
-            }
-        }
-
-        Debug.LogWarning("Vehicle data not found: " + type);
-        return null;
+        return prefabFactory.GetPrefab(type);
     }
 
     public bool IsVehicleRegistered(
@@ -36,19 +26,7 @@ public class VehicleDataManager : MonoBehaviour
 
     public int GetTotalVehicleCount()
     {
-        if (prefabManager == null)
-            return 0;
-
-        int count = 0;
-
-        foreach (VehiclePrefabManager.VehicleData vehicle
-                 in prefabManager.vehicles)
-        {
-            if (vehicle.prefab != null)
-                count++;
-        }
-
-        return count;
+        return GetRegisteredVehicleTypes().Count;
     }
 
     public List<VehiclePrefabManager.VehicleType>
@@ -57,17 +35,15 @@ public class VehicleDataManager : MonoBehaviour
         List<VehiclePrefabManager.VehicleType> types =
             new List<VehiclePrefabManager.VehicleType>();
 
-        if (prefabManager == null)
+        if (prefabFactory == null)
             return types;
 
-        foreach (VehiclePrefabManager.VehicleData vehicle
-                 in prefabManager.vehicles)
+        foreach (VehiclePrefabManager.VehicleType type in
+                 System.Enum.GetValues(
+                     typeof(VehiclePrefabManager.VehicleType)))
         {
-            if (vehicle.prefab != null &&
-                !types.Contains(vehicle.type))
-            {
-                types.Add(vehicle.type);
-            }
+            if (prefabFactory.GetPrefab(type) != null)
+                types.Add(type);
         }
 
         return types;

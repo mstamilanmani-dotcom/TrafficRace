@@ -13,9 +13,7 @@ public class VehicleAvailabilityChecker : MonoBehaviour
             return false;
         }
 
-        GameObject prefab = prefabFactory.GetPrefab(type);
-
-        return prefab != null;
+        return prefabFactory.GetPrefab(type) != null;
     }
 
     public int GetAvailableVehicleCount()
@@ -25,14 +23,13 @@ public class VehicleAvailabilityChecker : MonoBehaviour
 
         int count = 0;
 
-        if (prefabFactory.carPrefab != null) count++;
-        if (prefabFactory.bikePrefab != null) count++;
-        if (prefabFactory.busPrefab != null) count++;
-        if (prefabFactory.truckPrefab != null) count++;
-        if (prefabFactory.suvPrefab != null) count++;
-        if (prefabFactory.electricCarPrefab != null) count++;
-        if (prefabFactory.atherPrefab != null) count++;
-        if (prefabFactory.olaPrefab != null) count++;
+        foreach (VehiclePrefabManager.VehicleType type in
+                 System.Enum.GetValues(
+                     typeof(VehiclePrefabManager.VehicleType)))
+        {
+            if (prefabFactory.GetPrefab(type) != null)
+                count++;
+        }
 
         return count;
     }
